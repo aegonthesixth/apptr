@@ -1,0 +1,1470 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MUN Komite Konuşma Zamanlayıcısı</title>
+    <!-- CSS stilleri buraya gelecek -->
+</head>
+<body>
+    <div id="app">
+        <header>
+            <h1>MUN Komite Konuşma Zamanlayıcısı</h1>
+            <div class="auth-status">
+                <span id="auth-username">Giriş yapılmadı</span>
+                <button id="auth-button" class="button secondary">GitHub ile Giriş</button>
+            </div>
+        </header>
+<div class="tabs">
+            <button class="tab active" data-tab="main">Ana Gösterge Paneli</button>
+            <button class="tab" data-tab="speaking-list">Konuşma Listesi</button>
+            <button class="tab" data-tab="messaging">Mesajlaşma</button>
+        </div>
+        <!-- Ana Gösterge Paneli Sekmesi -->
+        <div id="main-tab" class="tab-content active">
+            <div class="top-controls">
+                <div class="committee-selector">
+                    <label for="committee-select">Komite:</label>
+                    <select id="committee-select">
+                        <option value="UNSC">UNSC</option>
+                        <option value="UNODC">UNODC</option>
+                        <option value="UNGA">UNGA</option>
+                        <option value="UNHRC">UNHRC</option>
+                        <option value="ECOSOC">ECOSOC</option>
+                        <option value="WHO">WHO</option>
+                    </select>
+                </div>
+                <div class="control-buttons">
+                    <button id="export-button" class="button warning">Veriyi Dışa Aktar</button>
+                    <button id="role-call-button" class="button">Yoklama</button>
+                    <button id="lock-countries-button" class="button secondary">Ülkeleri Kilitle</button>
+                </div>
+            </div>
+<div class="columns">
+                <div class="column">
+                    <!-- Ülke Listesi Kartı -->
+                    <div class="card">
+                        <div class="card-header">Ülkeler</div>
+                        <div class="card-body">
+                            <div class="list-container">
+                                <ul id="country-list" class="list"></ul>
+                            </div>
+                            <button id="add-to-list-button" class="button primary" style="width: 100%; margin-top: 10px;">Konuşma Listesine Ekle</button>
+                        </div>
+                    </div>
+
+                    <!-- Sıklık Listesi Kartı -->
+                    <div class="card">
+                        <div class="card-header">Konuşmacı Sıklığı</div>
+                        <div class="card-body">
+                            <div class="list-container">
+                                <ul id="frequency-list" class="list"></ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Performans Listesi Kartı -->
+                    <div class="card">
+                        <div class="card-header">
+                            <span>Konuşmacı Performansı</span>
+                            <button id="toggle-performance-button" class="button secondary" style="padding: 2px 8px; font-size: 0.8rem;">Göster</button>
+                        </div>
+                        <div class="card-body">
+                            <div id="performance-list-container" class="list-container" style="display: none;">
+                                <ul id="performance-list" class="list"></ul>
+                            </div>
+                            <div class="performance-legend">
+                                <div><span style="display: inline-block; width: 10px; height: 10px; border-radius: 50%; background-color: #4CAF50; margin-right: 5px;"></span> Yüksek Performans (>75%)</div>
+                                <div><span style="display: inline-block; width: 10px; height: 10px; border-radius: 50%; background-color: #FFA726; margin-right: 5px;"></span> Orta Performans (50-75%)</div>
+                                <div><span style="display: inline-block; width: 10px; height: 10px; border-radius: 50%; background-color: #F44336; margin-right: 5px;"></span> Düşük Performans (<50%)</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+  <div class="column">
+                    <!-- Zamanlayıcılar Bölümü -->
+                    <div class="card">
+                        <div class="card-header">Zamanlayıcılar</div>
+                        <div class="card-body">
+                            <div class="timer-cards">
+                                <div class="timer-card">
+                                    <div class="timer-title">Oturum</div>
+                                    <div class="timer-display" id="session-timer">00:00</div>
+                                    <div class="timer-settings">
+                                        <input type="number" class="timer-duration" min="1" value="10" data-timer="session"> dk
+                                        <button class="timer-set-button" data-timer="session">Ayarla</button>
+                                    </div>
+                                    <div class="timer-controls">
+                                        <button class="timer-button" data-timer="session" data-action="start">Başlat</button>
+                                        <button class="timer-button" data-timer="session" data-action="stop">Durdur</button>
+                                        <button class="timer-button" data-timer="session" data-action="reset">Sıfırla</button>
+                                    </div>
+                                </div>
+                                <div class="timer-card">
+                                    <div class="timer-title">Kokus</div>
+                                    <div class="timer-display" id="caucus-timer">00:00</div>
+                                    <div class="timer-settings">
+                                        <input type="number" class="timer-duration" min="1" value="5" data-timer="caucus"> dk
+                                        <button class="timer-set-button" data-timer="caucus">Ayarla</button>
+                                    </div>
+                                    <div class="timer-controls">
+                                        <button class="timer-button" data-timer="caucus" data-action="start">Başlat</button>
+                                        <button class="timer-button" data-timer="caucus" data-action="stop">Durdur</button>
+                                        <button class="timer-button" data-timer="caucus" data-action="reset">Sıfırla</button>
+                                    </div>
+                                </div>
+                                <div class="timer-card">
+                                    <div class="timer-title">Konuşma</div>
+                                    <div class="timer-display" id="speech-timer">00:00</div>
+                                    <div class="timer-settings">
+                                        <input type="number" class="timer-duration" min="1" value="1" data-timer="speech"> dk
+                                        <button class="timer-set-button" data-timer="speech">Ayarla</button>
+                                    </div>
+                                    <div class="timer-controls">
+                                        <button class="timer-button" data-timer="speech" data-action="start">Başlat</button>
+                                        <button class="timer-button" data-timer="speech" data-action="stop">Durdur</button>
+                                        <button class="timer-button" data-timer="speech" data-action="reset">Sıfırla</button>
+                                    </div>
+                                </div>
+                            </div>
+                            <button id="rearrange-timers-button" class="button secondary" style="width: 100%;">Zamanlayıcıları Yeniden Düzenle</button>
+                        </div>
+                    </div>
+
+                    <!-- Notlar Bölümü -->
+                    <div class="card">
+                        <div class="card-header">Notlar</div>
+                        <div class="card-body">
+                            <textarea id="notes-area" class="notes-area" placeholder="Notlarınızı buraya girin..."></textarea>
+                            <div class="note-buttons">
+                                <button class="button success" data-note="Good Speech">İyi Konuşma</button>
+                                <button class="button danger" data-note="Bad Speech">Kötü Konuşma</button>
+                                <button class="button primary" data-note="Good Diplomacy">İyi Diplomasi</button>
+                                <button class="button warning" data-note="Bad Diplomacy">Kötü Diplomasi</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Eğlence Modu Butonu - Devre Dışı -->
+                    <button id="fun-mode-button" class="button accent disabled" style="width: 100%; pointer-events: none; opacity: 0.5;" disabled>Eğlence Komite Modu</button>
+                </div>
+            </div>
+        </div>    
+<!-- Konuşma Listesi Sekmesi -->
+        <div id="speaking-list-tab" class="tab-content">
+            <div class="current-speaker">
+                <div class="current-speaker-label">Şu Anki Konuşmacı</div>
+                <div class="current-speaker-name" id="current-speaker-display">Yok</div>
+                <div>
+                    <button id="next-speaker-button" class="button success">Sonraki Konuşmacı</button>
+                    <button id="skip-speaker-button" class="button danger">Konuşmacıyı Atla</button>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">Konuşma Listesi</div>
+                <div class="card-body">
+                    <div class="list-container" style="height: 400px;">
+                        <ul id="speaking-list" class="list"></ul>
+                    </div>
+                    <div class="list-controls">
+                        <button id="move-up-button" class="button primary">Yukarı Taşı</button>
+                        <button id="move-down-button" class="button primary">Aşağı Taşı</button>
+                        <button id="remove-button" class="button danger">Kaldır</button>
+                        <button id="clear-list-button" class="button secondary">Listeyi Temizle</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+ <!-- Mesajlaşma Sekmesi -->
+        <div id="messaging-tab" class="tab-content">
+            <!-- Kimlik Doğrulama Gerektiren Panel -->
+            <div id="auth-required-panel">
+                <div class="card">
+                    <div class="card-body" style="text-align: center; padding: 40px 20px;">
+                        <h2>GitHub Kimlik Doğrulaması Gerekli</h2>
+                        <p>Mesajlaşma özelliğine erişmek için GitHub ile kimlik doğrulaması yapmanız gerekiyor.</p>
+                        <button id="auth-messaging-button" class="button primary">GitHub ile Kimlik Doğrula</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Mesajlaşma Arayüzü (başlangıçta gizli) -->
+            <div id="messaging-interface" style="display: none;">
+                <div class="messaging-container">
+                    <div class="delegates-list">
+                        <div class="card" style="height: 100%;">
+                            <div class="card-header">Delegeler</div>
+                            <div class="card-body" style="height: calc(100% - 50px); display: flex; flex-direction: column;">
+                                <div class="list-container" style="flex: 1;">
+                                    <ul id="conversation-list" class="list"></ul>
+                                </div>
+                                <button id="new-message-button" class="button success" style="margin-top: 10px;">Yeni Mesaj</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="messages-container">
+                        <div class="card" style="flex: 1; margin-bottom: 10px;">
+                            <div class="card-header">Mesajlar</div>
+                            <div class="card-body" style="height: calc(100% - 50px); overflow-y: auto;">
+                                <div id="message-display"></div>
+                            </div>
+                        </div>
+
+                        <div class="message-compose">
+                            <textarea id="message-input" class="message-input" placeholder="Mesajınızı buraya yazın..."></textarea>
+                            <div style="text-align: right;">
+                                <button id="send-message-button" class="button primary">Mesaj Gönder</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+<!-- Yoklama Modalı -->
+        <div id="role-call-modal" class="role-call-container">
+            <div class="role-call-modal">
+                <div class="role-call-header">
+                    <h2 id="role-call-title">Yoklama</h2>
+                    <div>
+                        <label for="role-call-date">Tarih:</label>
+                        <input type="text" id="role-call-date" placeholder="YYYY-AA-GG">
+                        <button id="add-date-button" class="button primary">Tarih Ekle</button>
+                        <button id="close-role-call-button" class="button">Kapat</button>
+                    </div>
+                </div>
+                <div class="role-call-body">
+                    <table id="role-call-table" class="role-call-table">
+                        <thead>
+                            <tr>
+                                <th>Ülke</th>
+                                <!-- Tarihler dinamik olarak eklenecek -->
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Ülkeler ve katılım bilgileri dinamik olarak eklenecek -->
+                        </tbody>
+                    </table>
+                    <div style="text-align: right; margin-top: 15px;">
+                        <button id="save-role-call-button" class="button success">Yoklamayı Kaydet</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Yeni Mesaj Diyaloğu -->
+        <div id="new-message-dialog" class="dialog">
+            <div class="dialog-content">
+                <h3 class="dialog-title">Yeni Mesaj</h3>
+                <div>
+                    <label for="recipient-select">Kime:</label>
+                    <select id="recipient-select" style="width: 100%; margin-bottom: 15px;"></select>
+                </div>
+                <div>
+                    <label for="new-message-text">Mesaj:</label>
+                    <textarea id="new-message-text" class="message-input"></textarea>
+                </div>
+                <div class="dialog-buttons">
+                    <button id="cancel-message-button" class="button secondary">İptal</button>
+                    <button id="send-new-message-button" class="button primary">Gönder</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Eğlence Modu Konteyneri (başlangıçta gizli) -->
+        <div id="fun-mode-container" style="display: none;">
+            <div class="fun-mode">
+                <div class="fun-mode-header">Eğlence Komite Modu</div>
+                <div class="fun-timer" id="fun-timer">00:00</div>
+                <div>
+                    <button class="button" style="background-color: #6A0DAD;" data-action="start-fun">Başlat</button>
+                    <button class="button" style="background-color: #6A0DAD;" data-action="stop-fun">Durdur</button>
+                    <button class="button" style="background-color: #6A0DAD;" data-action="reset-fun">Sıfırla</button>
+                </div>
+
+                <div class="game-options">
+                    <div class="game-option">
+                        <span>BM Şaradları - Oylar: <span class="vote-count">0</span></span>
+                        <button class="button primary vote-button">Oy Ver</button>
+                    </div>
+                    <div class="game-option">
+                        <span>Diplomatik Bilgi Yarışması - Oylar: <span class="vote-count">0</span></span>
+                        <button class="button primary vote-button">Oy Ver</button>
+                    </div>
+                    <div class="game-option">
+                        <span>Karar Yazma Yarışı - Oylar: <span class="vote-count">0</span></span>
+                        <button class="button primary vote-button">Oy Ver</button>
+                    </div>
+                    <div class="game-option">
+                        <span>Kriz Simülasyonu - Oylar: <span class="vote-count">0</span></span>
+                        <button class="button primary vote-button">Oy Ver</button>
+                    </div>
+                </div>
+
+                <button id="exit-fun-mode-button" class="button danger">Eğlence Modundan Çık</button>
+            </div>
+        </div>
+    </div>
+<script>
+// Uygulama durumunu takip eden nesne
+const state = {
+    selectedCommittee: 'UNSC',
+    speakerQueue: [],
+    currentSpeaker: null,
+    timerRunning: {
+        session: false,
+        caucus: false,
+        speech: false,
+        fun: false
+    },
+    timerIntervals: {
+        session: null,
+        caucus: null,
+        speech: null,
+        fun: null
+    },
+    timerElapsed: {
+        session: 600, // 10 dakika (saniye cinsinden)
+        caucus: 300,  // 5 dakika (saniye cinsinden)
+        speech: 60,   // 1 dakika (saniye cinsinden)
+        fun: 300      // 5 dakika (saniye cinsinden)
+    },
+    timerDurations: {
+        session: 600, 
+        caucus: 300,  
+        speech: 60,   
+        fun: 300      
+    },
+    delegateData: {},
+    isCountryListLocked: false,
+    attendanceData: {},
+    attendanceDates: [],
+    timerColors: [
+        'var(--timer-green)',
+        'var(--timer-blue)',
+        'var(--timer-orange)'
+    ],
+    showPerformanceList: false
+};
+
+// Komite ülkeleri tanımlanıyor
+const committeeCountries = {
+    UNSC: [
+        'Amerika Birleşik Devletleri', 'Birleşik Krallık', 'Fransa', 'Rusya', 'Çin',
+        'Cezayir', 'Ekvador', 'Guyana', 'Japonya', 'Malta', 
+        'Mozambik', 'Sierra Leone', 'Slovenya', 'Güney Kore', 'İsviçre'
+    ],
+    UNODC: [
+        'Afganistan', 'Arnavutluk', 'Cezayir', 'Arjantin', 'Avustralya',
+        'Belçika', 'Brezilya', 'Kanada', 'Çin', 'Kolombiya',
+        'Mısır', 'Fransa', 'Almanya', 'Hindistan', 'Endonezya',
+        'İran', 'İtalya', 'Japonya', 'Meksika', 'Hollanda',
+        'Nijerya', 'Pakistan', 'Rusya', 'Suudi Arabistan', 'Güney Afrika',
+        'İspanya', 'Tayland', 'Türkiye', 'Birleşik Krallık', 'Amerika Birleşik Devletleri'
+    ],
+    UNGA: [
+        'Afganistan', 'Arnavutluk', 'Cezayir', 'Andorra', 'Angola',
+        'Antigua ve Barbuda', 'Arjantin', 'Ermenistan', 'Avustralya', 'Avusturya',
+        'Azerbaycan', 'Bahamalar', 'Bahreyn', 'Bangladeş', 'Barbados',
+        'Belarus', 'Belçika', 'Belize', 'Benin', 'Butan',
+        'Bolivya', 'Bosna Hersek', 'Botsvana', 'Brezilya', 'Brunei',
+        'Bulgaristan', 'Burkina Faso', 'Burundi', 'Cabo Verde', 'Kamboçya'
+    ],
+    UNHRC: [
+        'Arjantin', 'Bangladeş', 'Belçika', 'Benin', 'Kamerun',
+        'Çin', 'Küba', 'Eritre', 'Finlandiya', 'Fransa',
+        'Gambiya', 'Gürcistan', 'Almanya', 'Honduras', 'Hindistan',
+        'Kazakistan', 'Litvanya', 'Lüksemburg', 'Malezya', 'Karadağ',
+        'Fas', 'Hollanda', 'Pakistan', 'Paraguay', 'Katar',
+        'Somali', 'Güney Afrika', 'Sudan', 'Birleşik Arap Emirlikleri', 'Amerika Birleşik Devletleri'
+    ],
+    ECOSOC: [
+        'Angola', 'Arjantin', 'Avustralya', 'Bangladeş', 'Brezilya',
+        'Kanada', 'Çin', 'Mısır', 'Fransa', 'Almanya',
+        'Gana', 'Hindistan', 'Endonezya', 'İran', 'İtalya',
+        'Japonya', 'Kenya', 'Meksika', 'Nijerya', 'Norveç',
+        'Rusya', 'Suudi Arabistan', 'Güney Afrika', 'İspanya', 'İsveç',
+        'Tayland', 'Türkiye', 'Birleşik Krallık', 'Amerika Birleşik Devletleri', 'Venezuela'
+    ],
+    WHO: [
+        'Arjantin', 'Avustralya', 'Brezilya', 'Kanada', 'Çin',
+        'Mısır', 'Etiyopya', 'Fransa', 'Almanya', 'Hindistan',
+        'Endonezya', 'İtalya', 'Japonya', 'Kenya', 'Meksika',
+        'Nijerya', 'Pakistan', 'Rusya', 'Suudi Arabistan', 'Güney Afrika',
+        'Güney Kore', 'İspanya', 'İsveç', 'İsviçre', 'Tayland',
+        'Türkiye', 'Birleşik Arap Emirlikleri', 'Birleşik Krallık', 'Amerika Birleşik Devletleri', 'Vietnam'
+    ]
+};
+
+// Zamanlayıcı ilişki göstergelerini güncelleme işlevi
+function updateTimerRelationships() {
+    const sessionMinutes = state.timerDurations.session / 60;
+    const caucusMinutes = state.timerDurations.caucus / 60;
+    const speechMinutes = state.timerDurations.speech / 60;
+    
+    // Bir oturumda kaç kokus ve konuşma sığabileceğini hesapla
+    const caucusesPerSession = Math.floor(sessionMinutes / caucusMinutes);
+    const speechesPerSession = Math.floor(sessionMinutes / speechMinutes);
+    
+    // UI'a ilişki göstergelerini ekle
+    const sessionCard = document.querySelector('.timer-card:nth-child(1)');
+    const caucusCard = document.querySelector('.timer-card:nth-child(2)');
+    const speechCard = document.querySelector('.timer-card:nth-child(3)');
+    
+    // Mevcut göstergeleri kaldır
+    const existingIndicators = document.querySelectorAll('.timer-relationship');
+    existingIndicators.forEach(el => el.remove());
+    
+    // Yeni göstergeler ekle
+    if (sessionCard) {
+        const indicator = document.createElement('div');
+        indicator.className = 'timer-relationship';
+        indicator.textContent = `İçerir: ${caucusesPerSession} kokus veya ${speechesPerSession} konuşma`;
+        
+        const settingsDiv = sessionCard.querySelector('.timer-settings');
+        if (settingsDiv) {
+            settingsDiv.insertAdjacentElement('afterend', indicator);
+        }
+    }
+    
+    if (caucusCard) {
+        const indicator = document.createElement('div');
+        indicator.className = 'timer-relationship';
+        indicator.textContent = `Oturum başına ${caucusesPerSession} kokus`;
+        
+        const settingsDiv = caucusCard.querySelector('.timer-settings');
+        if (settingsDiv) {
+            settingsDiv.insertAdjacentElement('afterend', indicator);
+        }
+    }
+    
+    if (speechCard) {
+        const indicator = document.createElement('div');
+        indicator.className = 'timer-relationship';
+        indicator.textContent = `Oturum başına ${speechesPerSession} konuşma`;
+        
+        const settingsDiv = speechCard.querySelector('.timer-settings');
+        if (settingsDiv) {
+            settingsDiv.insertAdjacentElement('afterend', indicator);
+        }
+    }
+}
+
+// Optimum zamanlayıcı ayarlarını doğrulama ve önerme işlevi
+function validateTimerSettings() {
+    const sessionMinutes = state.timerDurations.session / 60;
+    const caucusMinutes = state.timerDurations.caucus / 60;
+    const speechMinutes = state.timerDurations.speech / 60;
+    
+    // Oturum kokus tarafından eşit bölünebilir mi kontrol et
+    const caucusRemainder = sessionMinutes % caucusMinutes;
+    
+    // Oturum konuşma tarafından eşit bölünebilir mi kontrol et
+    const speechRemainder = sessionMinutes % speechMinutes;
+    
+    let suggestions = [];
+    
+    // Daha iyi bölünme için ayarlanmış değerler öner
+    if (caucusRemainder > 0) {
+        const suggestedCaucus = sessionMinutes / Math.round(sessionMinutes / caucusMinutes);
+        suggestions.push({
+            timer: 'caucus',
+            currentValue: caucusMinutes,
+            suggestedValue: Math.round(suggestedCaucus * 10) / 10, // 1 ondalık basamağa yuvarla
+            reason: 'Oturumun kokuslar halinde eşit bölünmesi için'
+        });
+    }
+    
+    if (speechRemainder > 0) {
+        const suggestedSpeech = sessionMinutes / Math.round(sessionMinutes / speechMinutes);
+        suggestions.push({
+            timer: 'speech',
+            currentValue: speechMinutes,
+            suggestedValue: Math.round(suggestedSpeech * 10) / 10, // 1 ondalık basamağa yuvarla
+            reason: 'Oturumun konuşmalar halinde eşit bölünmesi için'
+        });
+    }
+    
+    return suggestions;
+}
+
+// Önerileri kullanıcı dostu bir şekilde görüntüleme işlevi
+function showTimerSuggestions() {
+    const suggestions = validateTimerSettings();
+    
+    if (suggestions.length === 0) {
+        // Tüm zamanlayıcılar eşit bölünüyor, öneri gerekmez
+        const existingSuggestions = document.getElementById('timer-suggestions');
+        if (existingSuggestions) {
+            existingSuggestions.style.display = 'none';
+        }
+        return;
+    }
+    
+    // Öneri kutusu oluştur veya güncelle
+    let suggestionsBox = document.getElementById('timer-suggestions');
+    
+    if (!suggestionsBox) {
+        suggestionsBox = document.createElement('div');
+        suggestionsBox.id = 'timer-suggestions';
+        
+        // Zamanlayıcı kartlarından sonra ekle
+        const timerCards = document.querySelector('.timer-cards');
+        if (timerCards) {
+            timerCards.insertAdjacentElement('afterend', suggestionsBox);
+        }
+    } else {
+        suggestionsBox.style.display = 'block';
+    }
+    
+    // Önceki içeriği temizle
+    suggestionsBox.innerHTML = '<h4 style="margin-top: 0;">Zamanlayıcı İlişki Önerileri</h4>';
+    
+    // Önerileri ekle
+    const list = document.createElement('ul');
+    list.style.paddingLeft = '20px';
+    
+    suggestions.forEach(suggestion => {
+        const item = document.createElement('li');
+        item.style.marginBottom = '5px';
+        
+        const applyButton = document.createElement('button');
+        applyButton.textContent = 'Uygula';
+        applyButton.className = 'button primary';
+        applyButton.style.fontSize = '12px';
+        applyButton.style.padding = '2px 8px';
+        applyButton.style.marginLeft = '10px';
+        
+        applyButton.addEventListener('click', function() {
+            // Zamanlayıcı süre girdisini güncelle ve Ayarla düğmesini tetikle
+            const input = document.querySelector(`.timer-duration[data-timer="${suggestion.timer}"]`);
+            const setButton = document.querySelector(`.timer-set-button[data-timer="${suggestion.timer}"]`);
+            
+            if (input && setButton) {
+                input.value = suggestion.suggestedValue;
+                setButton.click(); // Ayarla düğmesinin tıklama olayını tetikle
+            }
+        });
+        
+        item.innerHTML = `<strong>${suggestion.timer === 'caucus' ? 'Kokus' : 'Konuşma'}</strong> zamanlayıcısını ${suggestion.currentValue}'dan <strong>${suggestion.suggestedValue}</strong> dakikaya değiştir ${suggestion.reason}.`;
+        item.appendChild(applyButton);
+        
+        list.appendChild(item);
+    });
+    
+    suggestionsBox.appendChild(list);
+}
+
+function formatTime(timeInSeconds) {
+    const minutes = Math.floor(timeInSeconds / 60).toString().padStart(2, '0');
+    const seconds = (timeInSeconds % 60).toString().padStart(2, '0');
+    return `${minutes}:${seconds}`;
+}
+
+function updateTimerDisplay(timerType) {
+    const display = document.getElementById(`${timerType.toLowerCase()}-timer`);
+    if (display) {
+        display.textContent = formatTime(state.timerElapsed[timerType.toLowerCase()]);
+    }
+}
+
+function startTimer(timerType) {
+    const lowerType = timerType.toLowerCase();
+    
+    // Temiz bir durum sağlamak için önce çalışan zamanlayıcıyı durdur
+    stopTimer(timerType);
+    
+    // Çalışma durumunu ayarla
+    state.timerRunning[lowerType] = true;
+    
+    // Geri sayım için yeni aralık oluştur
+    state.timerIntervals[lowerType] = setInterval(() => {
+        // Zamanlayıcıyı 1 saniye azalt
+        if (state.timerElapsed[lowerType] > 0) {
+            state.timerElapsed[lowerType]--;
+            updateTimerDisplay(timerType);
+        } else {
+            // Zamanlayıcı sıfıra ulaştı
+            stopTimer(timerType);
+            // Burada bir uyarı veya ses ekleyebilirsiniz
+            console.log(`${timerType} zamanlayıcısı bitti!`);
+        }
+    }, 1000);
+    
+    console.log(`${timerType} zamanlayıcısı geri sayımı ${state.timerElapsed[lowerType]} saniyeden başlatıldı`);
+}
+
+function stopTimer(timerType) {
+    const lowerType = timerType.toLowerCase();
+    
+    // Çalışmadığını düşünsek bile her zaman aralığı temizle
+    if (state.timerIntervals[lowerType]) {
+        clearInterval(state.timerIntervals[lowerType]);
+        state.timerIntervals[lowerType] = null;
+    }
+    
+    state.timerRunning[lowerType] = false;
+    console.log(`${timerType} zamanlayıcısı durduruldu`);
+}
+
+// Kayıtlı süreyi kullan
+function resetTimer(timerType) {
+    const lowerType = timerType.toLowerCase();
+    stopTimer(timerType);
+    state.timerElapsed[lowerType] = state.timerDurations[lowerType]; // Kayıtlı süreyi kullan
+    updateTimerDisplay(timerType);
+    console.log(`${timerType} zamanlayıcısı ${state.timerDurations[lowerType]} saniyeye sıfırlandı`);
+}
+
+// Zamanlayıcı süresini ayarlama işlevi
+function setTimerDuration(timerType, minutes) {
+    const seconds = minutes * 60;
+    const lowerType = timerType.toLowerCase();
+    
+    state.timerDurations[lowerType] = seconds;
+    
+    // Zamanlayıcı çalışmıyorsa, geçen süreyi de güncelle
+    if (!state.timerRunning[lowerType]) {
+        state.timerElapsed[lowerType] = seconds;
+        updateTimerDisplay(timerType);
+    }
+    
+    console.log(`${timerType} zamanlayıcı süresi ${minutes} dakika (${seconds} saniye) olarak ayarlandı`);
+    
+    // Zamanlayıcı ilişkilerini güncelle
+    updateTimerRelationships();
+    
+    // Gerekirse öneriler göster
+    showTimerSuggestions();
+}
+
+// Ülke listesini doldurma işlevi
+function populateCountryList(committee) {
+    const countryList = document.getElementById('country-list');
+    if (!countryList) return;
+    
+    countryList.innerHTML = '';
+    
+    if (!committeeCountries[committee]) {
+        console.error(`${committee} komitesi committeeCountries içinde bulunamadı`);
+        return;
+    }
+    
+    committeeCountries[committee].forEach(country => {
+        const li = document.createElement('li');
+        li.textContent = country;
+        li.className = 'list-item';
+        li.addEventListener('click', function() {
+            document.querySelectorAll('#country-list .list-item').forEach(item => {
+                item.classList.remove('selected');
+            });
+            this.classList.add('selected');
+        });
+        countryList.appendChild(li);
+    });
+    
+    console.log(`${committee} için ülke listesi ${committeeCountries[committee].length} ülkeyle dolduruldu`);
+}
+
+// Ülkeyi konuşma listesine ekleme işlevi
+function addToSpeakingList(country) {
+    if (!country) {
+        console.error("Konuşma listesine tanımsız ülke ekleme girişimi");
+        return;
+    }
+    
+    state.speakerQueue.push(country);
+    
+    // Sıklık verilerini güncelle
+    if (!state.delegateData[country]) {
+        state.delegateData[country] = {
+            speaking: 0,
+            votes: 0,
+            notes: []
+        };
+    }
+    state.delegateData[country].speaking++;
+    
+    console.log(`${country} konuşma listesine eklendi`);
+}
+
+// Konuşma listesi görüntüsünü güncelleme işlevi
+function updateSpeakingList() {
+    const speakingList = document.getElementById('speaking-list');
+    if (!speakingList) return;
+    
+    speakingList.innerHTML = '';
+    
+    state.speakerQueue.forEach((country, index) => {
+        const li = document.createElement('li');
+        li.textContent = country;
+        li.className = 'list-item';
+        li.dataset.index = index;
+        li.addEventListener('click', function() {
+            document.querySelectorAll('#speaking-list .list-item').forEach(item => {
+                item.classList.remove('selected');
+            });
+            this.classList.add('selected');
+        });
+        speakingList.appendChild(li);
+    });
+    
+    console.log(`Konuşma listesi ${state.speakerQueue.length} ülkeyle güncellendi`);
+}
+
+// Sıklık listesini güncelleme işlevi
+function updateFrequencyList() {
+    const frequencyList = document.getElementById('frequency-list');
+    if (!frequencyList) return;
+    
+    frequencyList.innerHTML = '';
+    
+    // Delege verilerinden dizi oluştur
+    const delegates = Object.keys(state.delegateData).map(country => {
+        return {
+            country: country,
+            count: state.delegateData[country].speaking
+        };
+    });
+    
+    // Konuşma sayısına göre azalan şekilde sırala
+    delegates.sort((a, b) => b.count - a.count);
+    
+    delegates.forEach(delegate => {
+        const li = document.createElement('li');
+        li.className = 'list-item';
+        
+        // Sıklığa göre renk belirle
+        let colorClass = '';
+        if (delegate.count > 5) {
+            colorClass = 'background-color: var(--danger);';
+        } else if (delegate.count > 3) {
+            colorClass = 'background-color: var(--warning);';
+        } else if (delegate.count > 0) {
+            colorClass = 'background-color: var(--success);';
+        }
+        
+        li.innerHTML = `<span class="frequency-indicator" style="${colorClass}"></span>${delegate.country} - ${delegate.count}`;
+        frequencyList.appendChild(li);
+    });
+}
+
+// Her delege için performans metriklerini hesaplama işlevi
+function calculatePerformance(delegate) {
+    // Delege verilerini al
+    const data = state.delegateData[delegate];
+    if (!data || !data.notes || data.notes.length === 0) {
+        return {
+            goodSpeechCount: 0,
+            badSpeechCount: 0,
+            goodDiplomacyCount: 0,
+            badDiplomacyCount: 0,
+            totalNotes: 0,
+            speechQuality: 0,
+            diplomacyQuality: 0,
+            overallPerformance: 0
+        };
+    }
+    
+    // Farklı not türlerini say
+    let goodSpeechCount = 0;
+    let badSpeechCount = 0;
+    let goodDiplomacyCount = 0;
+    let badDiplomacyCount = 0;
+    
+    data.notes.forEach(note => {
+        if (note.text === 'Good Speech') {
+            goodSpeechCount++;
+        } else if (note.text === 'Bad Speech') {
+            badSpeechCount++;
+        } else if (note.text === 'Good Diplomacy') {
+            goodDiplomacyCount++;
+        } else if (note.text === 'Bad Diplomacy') {
+            badDiplomacyCount++;
+        }
+    });
+    
+    const totalNotes = data.notes.length;
+    
+    // Konuşma kalitesini hesapla (iyi konuşmaların yüzdesi)
+    const totalSpeechNotes = goodSpeechCount + badSpeechCount;
+    const speechQuality = totalSpeechNotes > 0 ? (goodSpeechCount / totalSpeechNotes) * 100 : 0;
+    
+    // Diplomasi kalitesini hesapla (iyi diplomasinin yüzdesi)
+    const totalDiplomacyNotes = goodDiplomacyCount + badDiplomacyCount;
+    const diplomacyQuality = totalDiplomacyNotes > 0 ? (goodDiplomacyCount / totalDiplomacyNotes) * 100 : 0;
+    
+    // Genel performansı hesapla
+    // Her iki not türü varsa ortalamasını al. Aksi takdirde, mevcut olanı kullan.
+    let overallPerformance = 0;
+    if (totalSpeechNotes > 0 && totalDiplomacyNotes > 0) {
+        overallPerformance = (speechQuality + diplomacyQuality) / 2;
+    } else if (totalSpeechNotes > 0) {
+        overallPerformance = speechQuality;
+    } else if (totalDiplomacyNotes > 0) {
+        overallPerformance = diplomacyQuality;
+    }
+    
+    return {
+        goodSpeechCount,
+        badSpeechCount,
+        goodDiplomacyCount,
+        badDiplomacyCount,
+        totalNotes,
+        speechQuality,
+        diplomacyQuality,
+        overallPerformance
+    };
+}
+
+// Performans listesini güncelleme işlevi
+function updatePerformanceList() {
+    const performanceList = document.getElementById('performance-list');
+    if (!performanceList) return;
+    
+    performanceList.innerHTML = '';
+    
+    // Notları olan tüm delegeleri al
+    const delegatesWithNotes = Object.keys(state.delegateData)
+        .filter(delegate => 
+            state.delegateData[delegate].notes && 
+            state.delegateData[delegate].notes.length > 0
+        );
+    
+    // Her delege için performansı hesapla
+    const performances = delegatesWithNotes.map(delegate => {
+        const performance = calculatePerformance(delegate);
+        return {
+            delegate,
+            ...performance
+        };
+    });
+    
+    // Genel performansa göre sırala (en yüksek ilk)
+    performances.sort((a, b) => b.overallPerformance - a.overallPerformance);
+    
+    // Her delege için liste öğeleri oluştur
+    performances.forEach(perf => {
+        const li = document.createElement('li');
+        li.className = 'list-item';
+        
+        // Performansa göre renk belirle
+        let colorClass = '';
+        if (perf.overallPerformance >= 75) {
+            colorClass = 'background-color: var(--success);';
+        } else if (perf.overallPerformance >= 50) {
+            colorClass = 'background-color: var(--warning);';
+        } else {
+            colorClass = 'background-color: var(--danger);';
+        }
+        
+        // Performans detaylarını biçimlendir
+        const speechDetails = perf.goodSpeechCount + perf.badSpeechCount > 0 
+            ? `Konuşma: ${perf.speechQuality.toFixed(0)}% (${perf.goodSpeechCount}/${perf.goodSpeechCount + perf.badSpeechCount})` 
+            : 'Konuşma verisi yok';
+            
+        const diplomacyDetails = perf.goodDiplomacyCount + perf.badDiplomacyCount > 0 
+            ? `Diplomasi: ${perf.diplomacyQuality.toFixed(0)}% (${perf.goodDiplomacyCount}/${perf.goodDiplomacyCount + perf.badDiplomacyCount})` 
+            : 'Diplomasi verisi yok';
+        
+        li.innerHTML = `
+            <div>
+                <span class="frequency-indicator" style="${colorClass}"></span>
+                <strong>${perf.delegate}</strong> - ${perf.overallPerformance.toFixed(0)}%
+            </div>
+            <div style="font-size: 0.8rem; margin-left: 18px; color: var(--text-secondary);">
+                ${speechDetails} | ${diplomacyDetails}
+            </div>
+        `;
+        
+        performanceList.appendChild(li);
+    });
+    
+    // Gösterilecek performans yoksa
+    if (performances.length === 0) {
+        const li = document.createElement('li');
+        li.className = 'list-item';
+        li.textContent = 'Henüz performans verisi yok. Veriler burada görünmek için konuşmalar hakkında notlar alın.';
+        performanceList.appendChild(li);
+    }
+}
+
+// Performans listesi görünürlüğünü değiştirme işlevi
+function togglePerformanceList() {
+    state.showPerformanceList = !state.showPerformanceList;
+    
+    const container = document.getElementById('performance-list-container');
+    const toggleButton = document.getElementById('toggle-performance-button');
+    
+    if (container && toggleButton) {
+        if (state.showPerformanceList) {
+            container.style.display = 'block';
+            toggleButton.textContent = 'Gizle';
+            updatePerformanceList();
+        } else {
+            container.style.display = 'none';
+            toggleButton.textContent = 'Göster';
+        }
+    }
+}
+
+function generateRoleCallTable() {
+    const table = document.getElementById('role-call-table');
+    if (!table) return;
+    
+    const headerRow = table.querySelector('thead tr');
+    if (!headerRow) return;
+    
+    // İlk hariç mevcut başlık hücrelerini temizle
+    while (headerRow.children.length > 1) {
+        headerRow.removeChild(headerRow.lastChild);
+    }
+    
+    // Tarih başlıklarını ekle
+    state.attendanceDates.forEach(date => {
+        const th = document.createElement('th');
+        th.textContent = date;
+        headerRow.appendChild(th);
+    });
+    
+    // Mevcut gövde satırlarını temizle
+    const tbody = table.querySelector('tbody');
+    if (!tbody) return;
+    
+    tbody.innerHTML = '';
+    
+    // Ülke satırlarını ekle
+    const countries = committeeCountries[state.selectedCommittee];
+    countries.forEach(country => {
+        const tr = document.createElement('tr');
+        
+        const td = document.createElement('td');
+        td.textContent = country;
+        tr.appendChild(td);
+        
+        // Katılım hücrelerini ekle
+        state.attendanceDates.forEach(date => {
+            const td = document.createElement('td');
+            const checkbox = document.createElement('input');
+            checkbox.type = 'checkbox';
+            
+            // Katılım verisi varsa kontrol et
+            if (state.attendanceData[country] && state.attendanceData[country][date]) {
+                checkbox.checked = true;
+            }
+            
+            // Değişiklik olayı ekle
+            checkbox.addEventListener('change', function() {
+                if (!state.attendanceData[country]) {
+                    state.attendanceData[country] = {};
+                }
+                state.attendanceData[country][date] = this.checked;
+            });
+            
+            td.appendChild(checkbox);
+            tr.appendChild(td);
+        });
+        
+        tbody.appendChild(tr);
+    });
+}
+
+// Sekme değiştirme işlevselliğini kur
+// Sekme değiştirme işlevselliğini kur
+function setupTabSwitching() {
+    const tabs = document.querySelectorAll('.tab');
+    const tabContents = document.querySelectorAll('.tab-content');
+    
+    tabs.forEach(tab => {
+        tab.addEventListener('click', function() {
+            const tabName = this.getAttribute('data-tab');
+            
+            // Devre dışı bırakılmışsa atla
+            if (this.classList.contains('disabled')) {
+                return;
+            }
+            
+            // Aktif sekmeyi güncelle
+            tabs.forEach(t => t.classList.remove('active'));
+            this.classList.add('active');
+            
+            // Aktif içeriği güncelle
+            tabContents.forEach(content => {
+                content.classList.remove('active');
+                if (content.id === `${tabName}-tab`) {
+                    content.classList.add('active');
+                }
+            });
+        });
+    });
+}
+
+// Çeşitli düğmeler ve etkileşimli öğeler için olay dinleyicilerini kur
+function setupEventListeners() {
+    // Zamanlayıcı ayarları için olay dinleyicileri ekle
+    document.querySelectorAll('.timer-set-button').forEach(button => {
+        button.addEventListener('click', function() {
+            const timerType = this.getAttribute('data-timer');
+            const input = document.querySelector(`.timer-duration[data-timer="${timerType}"]`);
+            
+            if (input) {
+                const minutes = parseInt(input.value);
+                if (!isNaN(minutes) && minutes > 0) {
+                    setTimerDuration(timerType, minutes);
+                }
+            }
+        });
+    });
+    
+    // Güvenli olay dinleyicisi ekleme yardımcısı
+    function addSafeEventListener(id, event, callback) {
+        const element = document.getElementById(id);
+        if (element) {
+            element.addEventListener(event, callback);
+            return true;
+        } else {
+            console.warn(`${id} ID'li öğe olay dinleyicisi için bulunamadı`);
+            return false;
+        }
+    }
+    
+    // Komite seçim değişikliğini işle
+    addSafeEventListener('committee-select', 'change', function() {
+        state.selectedCommittee = this.value;
+        populateCountryList(state.selectedCommittee);
+        updateFrequencyList();
+    });
+
+    // Konuşma listesine ekle düğmesi
+    addSafeEventListener('add-to-list-button', 'click', function() {
+        const selectedCountry = document.querySelector('#country-list .list-item.selected');
+        if (selectedCountry) {
+            const country = selectedCountry.textContent;
+            addToSpeakingList(country);
+            updateSpeakingList();
+            updateFrequencyList();
+        } else {
+            console.log("Konuşma listesine eklenecek ülke seçilmedi");
+            alert("Lütfen konuşma listesine eklemek için bir ülke seçin.");
+        }
+    });
+
+    // Zamanlayıcı düğmeleri için olay dinleyicileri ekle
+    document.querySelectorAll('.timer-button').forEach(button => {
+        button.addEventListener('click', function(event) {
+            // Güvenli olmak için varsayılanı önle
+            event.preventDefault();
+            
+            const timer = this.getAttribute('data-timer');
+            const action = this.getAttribute('data-action');
+            
+            console.log(`Zamanlayıcı düğmesine tıklandı: ${timer} - ${action}`);
+            
+            if (action === 'start') {
+                startTimer(timer);
+            } else if (action === 'stop') {
+                stopTimer(timer);
+            } else if (action === 'reset') {
+                resetTimer(timer);
+            }
+        });
+    });
+
+    // Sonraki konuşmacı düğmesi
+    addSafeEventListener('next-speaker-button', 'click', function() {
+        if (state.speakerQueue.length > 0) {
+            if (state.currentSpeaker) {
+                // Mevcut konuşmacı bitti
+                resetTimer('speech');
+            }
+            
+            // Sonraki konuşmacıyı al
+            state.currentSpeaker = state.speakerQueue.shift();
+            const currentSpeakerDisplay = document.getElementById('current-speaker-display');
+            if (currentSpeakerDisplay) {
+                currentSpeakerDisplay.textContent = state.currentSpeaker;
+            }
+            
+            // Konuşma zamanlayıcısını başlat
+            resetTimer('speech');
+            startTimer('speech');
+            
+            // Görüntüleri güncelle
+            updateSpeakingList();
+            
+            // Performans listesi gösteriliyorsa güncelle
+            if (state.showPerformanceList) {
+                updatePerformanceList();
+            }
+        } else {
+            console.log("Sırada konuşmacı yok");
+            alert("Sırada konuşmacı yok.");
+        }
+    });
+
+    // Konuşmacı atlama düğmesi
+    addSafeEventListener('skip-speaker-button', 'click', function() {
+        if (state.currentSpeaker) {
+            resetTimer('speech');
+            state.currentSpeaker = null;
+            
+            const currentSpeakerDisplay = document.getElementById('current-speaker-display');
+            if (currentSpeakerDisplay) {
+                currentSpeakerDisplay.textContent = 'Yok';
+            }
+            
+            if (state.speakerQueue.length > 0) {
+                state.currentSpeaker = state.speakerQueue.shift();
+                if (currentSpeakerDisplay) {
+                    currentSpeakerDisplay.textContent = state.currentSpeaker;
+                }
+                resetTimer('speech');
+                startTimer('speech');
+            }
+            
+            updateSpeakingList();
+        }
+    });
+
+    // Konuşma listesi kontrolleri
+    addSafeEventListener('move-up-button', 'click', function() {
+        const selected = document.querySelector('#speaking-list .list-item.selected');
+        if (selected) {
+            const index = parseInt(selected.dataset.index);
+            if (index > 0) {
+                // Önceki öğeyle değiştir
+                [state.speakerQueue[index], state.speakerQueue[index - 1]] = [state.speakerQueue[index - 1], state.speakerQueue[index]];
+                updateSpeakingList();
+                
+                // Öğeyi seçili tut
+                const items = document.querySelectorAll('#speaking-list .list-item');
+                if (items.length > index - 1) {
+                    items[index - 1].classList.add('selected');
+                }
+            }
+        }
+    });
+
+    addSafeEventListener('move-down-button', 'click', function() {
+        const selected = document.querySelector('#speaking-list .list-item.selected');
+        if (selected) {
+            const index = parseInt(selected.dataset.index);
+            if (index < state.speakerQueue.length - 1) {
+                // Sonraki öğeyle değiştir
+                [state.speakerQueue[index], state.speakerQueue[index + 1]] = [state.speakerQueue[index + 1], state.speakerQueue[index]];
+                updateSpeakingList();
+                
+                // Öğeyi seçili tut
+                const items = document.querySelectorAll('#speaking-list .list-item');
+                if (items.length > index + 1) {
+                    items[index + 1].classList.add('selected');
+                }
+            }
+        }
+    });
+
+    addSafeEventListener('remove-button', 'click', function() {
+        const selected = document.querySelector('#speaking-list .list-item.selected');
+        if (selected) {
+            const index = parseInt(selected.dataset.index);
+            state.speakerQueue.splice(index, 1);
+            updateSpeakingList();
+        }
+    });
+
+    addSafeEventListener('clear-list-button', 'click', function() {
+        if (confirm("Tüm konuşma listesini temizlemek istediğinizden emin misiniz?")) {
+            state.speakerQueue = [];
+            updateSpeakingList();
+        }
+    });
+
+    // Notlar işlevselliği - Düzeltilmiş versiyon
+    document.querySelectorAll('.note-buttons .button').forEach(button => {
+        button.addEventListener('click', function() {
+            const noteText = this.getAttribute('data-note');
+            const notesArea = document.getElementById('notes-area');
+            
+            if (state.currentSpeaker && notesArea) {
+                const timestamp = new Date().toLocaleTimeString();
+                const note = `[${timestamp}] ${state.currentSpeaker}: ${noteText}`;
+                
+                // Metin alanına ekle
+                notesArea.value += (notesArea.value ? '\n' : '') + note;
+                
+                // Delege verilerine ekle
+                if (!state.delegateData[state.currentSpeaker]) {
+                    state.delegateData[state.currentSpeaker] = {
+                        speaking: 0,
+                        votes: 0,
+                        notes: []
+                    };
+                }
+                
+                state.delegateData[state.currentSpeaker].notes.push({
+                    timestamp: timestamp,
+                    text: noteText
+                });
+                
+                console.log(`${state.currentSpeaker} için not eklendi: ${noteText}`);
+                
+                // Yeni verileri yansıtmak için frekans listesini güncelle
+                updateFrequencyList();
+                
+                // Performans listesi gösteriliyorsa güncelle
+                if (state.showPerformanceList) {
+                    updatePerformanceList();
+                }
+            } else {
+                console.warn('Not almak için seçili konuşmacı yok');
+                alert('Lütfen not almadan önce bir konuşmacı seçin.');
+            }
+        });
+    });
+
+    // Ülkeleri kilitleme işlevselliği
+    addSafeEventListener('lock-countries-button', 'click', function() {
+        state.isCountryListLocked = !state.isCountryListLocked;
+        
+        const countryListItems = document.querySelectorAll('#country-list .list-item');
+        if (state.isCountryListLocked) {
+            this.textContent = 'Ülkelerin Kilidini Aç';
+            countryListItems.forEach(item => {
+                item.style.pointerEvents = 'none';
+                item.style.opacity = '0.6';
+            });
+        } else {
+            this.textContent = 'Ülkeleri Kilitle';
+            countryListItems.forEach(item => {
+                item.style.pointerEvents = 'auto';
+                item.style.opacity = '1';
+            });
+        }
+    });
+
+    // Performans Listesi Değiştirme
+    addSafeEventListener('toggle-performance-button', 'click', togglePerformanceList);
+    
+    // Eğlence Modu işlevselliği - Düzeltilmiş 
+    addSafeEventListener('fun-mode-button', 'click', function() {
+        // Eğlence modu düğmesini devre dışı bırakıldığı için bu fonksiyon çalışmayacak
+        // Ancak kodunu tutuyoruz, tamamen kaldırmak yerine
+        console.log('Eğlence modu düğmesi tıklanamaz');
+    });
+
+    addSafeEventListener('exit-fun-mode-button', 'click', function() {
+        const appElement = document.getElementById('app');
+        const funModeContainer = document.getElementById('fun-mode-container');
+        
+        if (appElement && funModeContainer) {
+            appElement.style.display = 'block';
+            funModeContainer.style.display = 'none';
+            stopTimer('fun');
+        }
+    });
+
+    // Eğlence modu zamanlayıcı kontrolleri - Düzeltilmiş
+    document.querySelectorAll('[data-action="start-fun"], [data-action="stop-fun"], [data-action="reset-fun"]').forEach(button => {
+        button.addEventListener('click', function() {
+            const action = this.getAttribute('data-action');
+            
+            if (action === 'start-fun') {
+                startTimer('fun');
+            } else if (action === 'stop-fun') {
+                stopTimer('fun');
+            } else if (action === 'reset-fun') {
+                resetTimer('fun');
+            }
+        });
+    });
+
+    // Eğlence modu oylaması
+    document.querySelectorAll('.vote-button').forEach(button => {
+        button.addEventListener('click', function() {
+            const voteCount = this.parentElement.querySelector('.vote-count');
+            if (voteCount) {
+                const currentCount = parseInt(voteCount.textContent);
+                voteCount.textContent = currentCount + 1;
+            }
+        });
+    });
+
+    // Yoklama işlevselliği
+    addSafeEventListener('role-call-button', 'click', function() {
+        generateRoleCallTable();
+        const roleCallModal = document.getElementById('role-call-modal');
+        if (roleCallModal) {
+            roleCallModal.style.display = 'flex';
+        }
+    });
+
+    addSafeEventListener('close-role-call-button', 'click', function() {
+        const roleCallModal = document.getElementById('role-call-modal');
+        if (roleCallModal) {
+            roleCallModal.style.display = 'none';
+        }
+    });
+
+    addSafeEventListener('add-date-button', 'click', function() {
+        const dateInput = document.getElementById('role-call-date');
+        if (!dateInput) return;
+        
+        const date = dateInput.value.trim();
+        
+        if (date && !state.attendanceDates.includes(date)) {
+            state.attendanceDates.push(date);
+            generateRoleCallTable();
+        }
+        
+        dateInput.value = '';
+    });
+
+    addSafeEventListener('save-role-call-button', 'click', function() {
+        // Gerçek bir uygulamada, bu veritabanına kaydederdi
+        alert('Yoklama verileri başarıyla kaydedildi!');
+    });
+
+    // Veri dışa aktarma işlevselliği
+    addSafeEventListener('export-button', 'click', function() {
+        const exportData = {
+            committee: state.selectedCommittee,
+            delegateData: state.delegateData,
+            attendanceData: state.attendanceData,
+            attendanceDates: state.attendanceDates,
+            currentTime: new Date().toISOString()
+        };
+        
+        const dataStr = JSON.stringify(exportData, null, 2);
+        const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+        
+        const exportFileDefaultName = `MUN_${state.selectedCommittee}_veri.json`;
+        
+        const linkElement = document.createElement('a');
+        linkElement.setAttribute('href', dataUri);
+        linkElement.setAttribute('download', exportFileDefaultName);
+        linkElement.click();
+    });
+
+    // Zamanlayıcıları Yeniden Düzenleme işlevselliği
+    addSafeEventListener('rearrange-timers-button', 'click', function() {
+        // Zamanlayıcı renklerini döndür
+        state.timerColors.unshift(state.timerColors.pop());
+        
+        // Yeni renkleri uygula
+        document.querySelectorAll('.timer-card').forEach((card, index) => {
+            card.style.backgroundColor = state.timerColors[index];
+        });
+    });
+}
+
+// Uygulamayı kur
+function initializeApp() {
+    // Varsayılan komite ile başlat
+    populateCountryList(state.selectedCommittee);
+
+    // Zamanlayıcı ekranlarını başlat
+    updateTimerDisplay('session');
+    updateTimerDisplay('caucus');
+    updateTimerDisplay('speech');
+    updateTimerDisplay('fun');
+    
+    // Zamanlayıcı ilişki göstergelerini başlat
+    updateTimerRelationships();
+    
+    // Gerekirse ilk önerileri göster
+    showTimerSuggestions();
+    
+    // Sekme değiştirmeyi kur
+    setupTabSwitching();
+    
+    // Tüm düğmeler ve etkileşimli öğeler için olay dinleyicileri kur
+    setupEventListeners();
+    
+    // Eğlence modu düğmesini devre dışı bırak
+    const funModeButton = document.getElementById('fun-mode-button');
+    if (funModeButton) {
+        funModeButton.classList.add('disabled');
+        funModeButton.disabled = true;
+        funModeButton.style.pointerEvents = 'none';
+        funModeButton.style.opacity = '0.5';
+    }
+    
+    console.log("MUN Komite Zamanlayıcı Uygulaması başarıyla başlatıldı");
+}
+
+// Hata ayıklama yardımcı işlevi
+function debugState() {
+    console.log('Mevcut durum:', JSON.stringify(state, null, 2));
+}
+
+// DOM tamamen yüklendiğinde uygulamayı başlat
+document.addEventListener('DOMContentLoaded', function() {
+    initializeApp();
+    
+    // Dinamik olarak oluşturulabilecek öğeler için ek olay dinleyicileri
+    const togglePerformanceButton = document.getElementById('toggle-performance-button');
+    if (togglePerformanceButton) {
+        togglePerformanceButton.addEventListener('click', togglePerformanceList);
+    }
+    
+    // Eğlence modu düğmelerini açıkça ayarla
+    const funButtons = document.querySelectorAll('[data-action="start-fun"], [data-action="stop-fun"], [data-action="reset-fun"]');
+    funButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const action = this.getAttribute('data-action');
+            
+            if (action === 'start-fun') {
+                startTimer('fun');
+            } else if (action === 'stop-fun') {
+                stopTimer('fun');
+            } else if (action === 'reset-fun') {
+                resetTimer('fun');
+            }
+        });
+    });
+    
+    // Not düğmeleri için açık dinleyiciler ekle
+    document.querySelectorAll('.note-buttons .button').forEach(button => {
+        button.addEventListener('click', function() {
+            const noteText = this.getAttribute('data-note');
+            const notesArea = document.getElementById('notes-area');
+            
+            if (state.currentSpeaker && notesArea) {
+                const timestamp = new Date().toLocaleTimeString();
+                const note = `[${timestamp}] ${state.currentSpeaker}: ${noteText === 'Good Speech' ? 'İyi Konuşma' : 
+                                       noteText === 'Bad Speech' ? 'Kötü Konuşma' : 
+                                       noteText === 'Good Diplomacy' ? 'İyi Diplomasi' : 'Kötü Diplomasi'}`;
+                
+                // Metin alanına ekle
+                notesArea.value += (notesArea.value ? '\n' : '') + note;
+                
+                // Delege verilerine ekle
+                if (!state.delegateData[state.currentSpeaker]) {
+                    state.delegateData[state.currentSpeaker] = {
+                        speaking: 0,
+                        votes: 0,
+                        notes: []
+                    };
+                }
+                
+                state.delegateData[state.currentSpeaker].notes.push({
+                    timestamp: timestamp,
+                    text: noteText
+                });
+                
+                // Görüntüleri güncelle
+                updateFrequencyList();
+                if (state.showPerformanceList) {
+                    updatePerformanceList();
+                }
+            } else {
+                alert('Lütfen not almadan önce bir konuşmacı seçin.');
+            }
+        });
+    });
+    
+    console.log('Uygulama durumunu hata ayıklamak için konsolda debugState() işlevini çalıştırın');
+});
+</script>
+  
